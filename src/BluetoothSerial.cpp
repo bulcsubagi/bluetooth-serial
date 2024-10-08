@@ -40,8 +40,11 @@ void BluetoothSerial::readSerial(char terminator /* = '\n' */, int terminatingTi
             double values[2];
             int id;
 
-            int numValues = sscanf(jValues.c_str(), "%d:%lf,%lf", &id, &values[0], &values[1]);
+            char float1[16], float2[16];
+			      int numValues = sscanf(jValues.c_str(), "%d:%15[^,],%15s", &id, float1, float2); //this change is necessary because same Arduino microocontrollers (including MEGA that i tested) can not handle %fl, so i found this workaround. 
             if (numValues == 3 && id >= 0 && id < MAX_JOYSTICKS) {
+				        values[0] = atof(float1);  // Convert first float string to actual float
+				        values[1] = atof(float2);
                 _joysticksList[id].updateValues(values[0], values[1]);
                 _joysticksUpdatedList[id] = true; // Mark joystick as updated
             } else {
